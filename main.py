@@ -21,7 +21,7 @@ def get_color_set(count, count_non_black):
     return colors
 
 
-def create_square(border, draw, color, element, size):
+def draw_cell(border, draw, color, element, size):
     if element == int(size / 2):
         draw.rectangle(border, color)
     elif len(list_sym) == element + 1:
@@ -31,22 +31,21 @@ def create_square(border, draw, color, element, size):
         draw.rectangle(border, color)
 
 
-def create_invader(border, draw, size):
-    x0, y0, square_size = border
-    square_size = square_size / size
+def draw_sprite(border, draw, invader_width):
+    cell_width = border.size / invader_width
     colors = get_color_set(6, 3)
     i = 1
-    for y in range(0, size):
+    for y in range(0, invader_width):
         i *= -1
         element = 0
-        for x in range(0, size):
-            topLeftX = x*square_size + x0
-            topLeftY = y*square_size + y0
-            botRightX = topLeftX + square_size
-            botRightY = topLeftY + square_size
-            create_square((topLeftX, topLeftY, botRightX, botRightY), draw,
-                          random.choice(colors), element, size)
-            if (element == int(size/2) or element == 0):
+        for x in range(0, invader_width):
+            topLeftX = x * cell_width + border.top_left_x
+            topLeftY = y * cell_width + border.top_left_y
+            botRightX = topLeftX + cell_width
+            botRightY = topLeftY + cell_width
+            draw_cell((topLeftX, topLeftY, botRightX, botRightY), draw,
+                      random.choice(colors), element, invader_width)
+            if element == int(invader_width / 2) or element == 0:
                 i *= -1
             element += i
 
@@ -54,20 +53,20 @@ def create_invader(border, draw, size):
 def main(invader_width, invader_count, picture_width):
     result_image = Image.new("RGB", (picture_width, picture_width))
     draw = ImageDraw.Draw(result_image)
-    invaderSize = picture_width / invader_count
-    padding = invaderSize/invader_width
+    invader_size = picture_width / invader_count
+    padding = invader_size / invader_width
     for x in range(0, invader_count):
         for y in range(0, invader_count):
             square = Square(
-                x * invaderSize + padding / 2,
-                y * invaderSize + padding / 2,
-                invaderSize - padding
+                x * invader_size + padding / 2,
+                y * invader_size + padding / 2,
+                invader_size - padding
             )
-            create_invader(square, draw, invader_width)
+            draw_sprite(square, draw, invader_width)
     if not os.path.exists("./Examples"):
         os.mkdir("./Examples")
-
-    result_image.save("Examples/Example-{0}x{0}-{1}-{2}.jpg".format(invader_width, invader_count, picture_width))
+    result_image.save("Examples/Example-{0}x{0}-{1}-{2}.jpg".format(
+        invader_width, invader_count, picture_width))
 
 
 if __name__ == "__main__":
