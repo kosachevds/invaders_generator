@@ -30,26 +30,23 @@ def draw_cell(square, draw, color):
 def draw_sprite(border, draw, invader_width):
     cell_width = border.size / invader_width
     colors = get_color_set(6, 3)
-    i = 1
     color_stack = []
-    for y in range(0, invader_width):
-        i *= -1
-        element = 0
-        for x in range(0, invader_width):
+    middle = int(invader_width / 2)
+    for y in range(invader_width):
+        for i, x in enumerate(range(invader_width)):
             square = Square(
                 x * cell_width + border.top_left_x,
                 y * cell_width + border.top_left_y,
                 cell_width
             )
-            color = random.choice(colors)
-            if len(color_stack) == element + 1:
+            # TODO: remade all magic with element
+            if i <= middle:
+                color = random.choice(colors)
+                if i != middle:
+                    color_stack.append(color)
+            else:
                 color = color_stack.pop()
-            elif element != int(invader_width / 2):
-                color_stack.append(color)
             draw_cell(square, draw, color)
-            if element == int(invader_width / 2) or element == 0:
-                i *= -1
-            element += i
 
 
 def main(invader_width, invader_count, picture_width):
