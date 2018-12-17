@@ -9,7 +9,8 @@ from PIL import Image, ImageDraw
 list_sym = []
 
 
-Square = namedtuple("top_left_x", "top_left_y", "size")
+Square = namedtuple("Square", ["top_left_x", "top_left_y", "bot_right_x",
+                               "bot_right_y"])
 
 
 def get_color_set(count, count_non_black):
@@ -60,9 +61,13 @@ def main(invader_width, invader_count, picture_width):
         for y in range(0, invader_count):
             topLeftX = x * invaderSize + padding / 2
             topLeftY = y * invaderSize + padding / 2
-            botRightX = topLeftX + invaderSize - padding
-            botRightY = topLeftY + invaderSize - padding
-            create_invader((topLeftX, topLeftY, botRightX, botRightY), draw, invader_width)
+            square = Square(
+                topLeftX,
+                topLeftY,
+                topLeftX + invaderSize - padding,
+                topLeftY + invaderSize - padding
+            )
+            create_invader(square, draw, invader_width)
     if not os.path.exists("./Examples"):
         os.mkdir("./Examples")
 
