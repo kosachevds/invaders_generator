@@ -6,9 +6,6 @@ import numpy as np
 
 from PIL import Image, ImageDraw
 
-color_stack = []
-
-
 Square = namedtuple("Square", ["top_left_x", "top_left_y", "size"])
 
 
@@ -21,25 +18,20 @@ def get_color_set(count, count_non_black):
     return colors
 
 
-def draw_cell(square, draw, color, element, size):
+def draw_cell(square, draw, color):
     border = (
         square.top_left_x,
         square.top_left_y,
         square.top_left_x + square.size,
         square.top_left_y + square.size)
-    if element == int(size / 2):
-        draw.rectangle(border, color)
-    elif len(color_stack) == element + 1:
-        draw.rectangle(border, color_stack.pop())
-    else:
-        color_stack.append(color)
-        draw.rectangle(border, color)
+    draw.rectangle(border, color)
 
 
 def draw_sprite(border, draw, invader_width):
     cell_width = border.size / invader_width
     colors = get_color_set(6, 3)
     i = 1
+    color_stack = []
     for y in range(0, invader_width):
         i *= -1
         element = 0
@@ -49,8 +41,12 @@ def draw_sprite(border, draw, invader_width):
                 y * cell_width + border.top_left_y,
                 cell_width
             )
-            random_color = random.choice(colors)
-            draw_cell(square, draw, random_color, element, invader_width)
+            color = random.choice(colors)
+            if len(color_stack) == element + 1:
+                color = color_stack.pop()
+            elif element != int(invader_width / 2):
+                color_stack.append(color)
+            draw_cell(square, draw, color)
             if element == int(invader_width / 2) or element == 0:
                 i *= -1
             element += i
