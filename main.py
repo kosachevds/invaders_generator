@@ -6,7 +6,7 @@ import numpy as np
 
 from PIL import Image, ImageDraw
 
-list_sym = []
+color_stack = []
 
 
 Square = namedtuple("Square", ["top_left_x", "top_left_y", "size"])
@@ -21,13 +21,18 @@ def get_color_set(count, count_non_black):
     return colors
 
 
-def draw_cell(border, draw, color, element, size):
+def draw_cell(square, draw, color, element, size):
+    border = (
+        square.top_left_x,
+        square.top_left_y,
+        square.top_left_x + square.size,
+        square.top_left_y + square.size)
     if element == int(size / 2):
         draw.rectangle(border, color)
-    elif len(list_sym) == element + 1:
-        draw.rectangle(border, list_sym.pop())
+    elif len(color_stack) == element + 1:
+        draw.rectangle(border, color_stack.pop())
     else:
-        list_sym.append(color)
+        color_stack.append(color)
         draw.rectangle(border, color)
 
 
@@ -39,12 +44,13 @@ def draw_sprite(border, draw, invader_width):
         i *= -1
         element = 0
         for x in range(0, invader_width):
-            topLeftX = x * cell_width + border.top_left_x
-            topLeftY = y * cell_width + border.top_left_y
-            botRightX = topLeftX + cell_width
-            botRightY = topLeftY + cell_width
-            draw_cell((topLeftX, topLeftY, botRightX, botRightY), draw,
-                      random.choice(colors), element, invader_width)
+            square = Square(
+                x * cell_width + border.top_left_x,
+                y * cell_width + border.top_left_y,
+                cell_width
+            )
+            random_color = random.choice(colors)
+            draw_cell(square, draw, random_color, element, invader_width)
             if element == int(invader_width / 2) or element == 0:
                 i *= -1
             element += i
