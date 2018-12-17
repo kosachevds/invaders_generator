@@ -32,6 +32,8 @@ def draw_sprite(border, draw, invader_width):
     colors = get_color_set(6, 3)
     color_stack = []
     middle = int(invader_width / 2)
+    # cells = []
+    # TODO: count black cells and regenerate esli ih mnogo
     for y in range(invader_width):
         for i, x in enumerate(range(invader_width)):
             square = Square(
@@ -39,7 +41,6 @@ def draw_sprite(border, draw, invader_width):
                 y * cell_width + border.top_left_y,
                 cell_width
             )
-            # TODO: remade all magic with element
             if i <= middle:
                 color = random.choice(colors)
                 if i != middle:
