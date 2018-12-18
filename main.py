@@ -27,18 +27,17 @@ def draw_cell(square, draw, color):
     draw.rectangle(border, color)
 
 
-def draw_sprite(border, draw, invader_width):
-    cell_width = border.size / invader_width
+def generate_sprite_cells(square, invader_width):
+    cell_width = square.size / invader_width
     colors = get_color_set(6, 3)
     color_stack = []
     middle = int(invader_width / 2)
-    # cells = []
-    # TODO: count black cells and regenerate esli ih mnogo
+    cells = {}
     for y in range(invader_width):
         for i, x in enumerate(range(invader_width)):
-            square = Square(
-                x * cell_width + border.top_left_x,
-                y * cell_width + border.top_left_y,
+            cell = Square(
+                x * cell_width + square.top_left_x,
+                y * cell_width + square.top_left_y,
                 cell_width
             )
             if i <= middle:
@@ -47,7 +46,17 @@ def draw_sprite(border, draw, invader_width):
                     color_stack.append(color)
             else:
                 color = color_stack.pop()
-            draw_cell(square, draw, color)
+            cells[cell] = color
+    black_cell_count = sum(1 for color in cells.values() if color == (0, 0, 0))
+    if black_cell_count < len(cells) / 2:
+        return cells
+    return generate_sprite_cells(square, invader_width)
+
+
+def draw_sprite(square, draw, invader_width):
+    cells = generate_sprite_cells(square, invader_width)
+    for cell, color in cells.items():
+        draw_cell(cell, draw, color)
 
 
 def main(invader_width, invader_count, picture_width):
