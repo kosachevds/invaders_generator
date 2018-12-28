@@ -3,13 +3,17 @@ import sys
 import os
 from collections import namedtuple
 import numpy as np
+import typing
 
 from PIL import Image, ImageDraw
 
-Square = namedtuple("Square", ["top_left_x", "top_left_y", "size"])
+class Square(typing.NamedTuple):
+    top_left_x: float
+    top_left_y: float
+    size: float
 
 
-def get_color_set(count, count_non_black):
+def get_color_set(count: int, count_non_black: int) -> list:
     lower = 50
     upper = 215
     colors = np.random.randint(lower, upper, (count_non_black, 3))
@@ -18,7 +22,7 @@ def get_color_set(count, count_non_black):
     return colors
 
 
-def draw_cell(square, draw, color):
+def draw_cell(square: Square, draw: ImageDraw, color: tuple):
     border = (
         square.top_left_x,
         square.top_left_y,
@@ -40,12 +44,14 @@ def generate_sprite_cells(square, invader_width):
                 y * cell_width + square.top_left_y,
                 cell_width
             )
-            if i <= middle:
-                color = random.choice(colors)
-                if i != middle:
-                    color_stack.append(color)
-            else:
+            color_from_stack = (i > middle or
+                                i == middle and invader_width % 2 == 0)
+            if color_from_stack:
                 color = color_stack.pop()
+            else:
+                color = random.choice(colors)
+                if not (i == middle):
+                    color_stack.append(color)
             cells[cell] = color
     black_cell_count = sum(1 for color in cells.values() if color == (0, 0, 0))
     if black_cell_count < len(cells) / 2:
@@ -55,7 +61,7 @@ def generate_sprite_cells(square, invader_width):
 
 def draw_sprite(square, draw, invader_width):
     cells = generate_sprite_cells(square, invader_width)
-    for cell, color in cells.items():
+    for (cell, color) in cells.items():
         draw_cell(cell, draw, color)
 
 
@@ -79,5 +85,5 @@ def main(invader_width, invader_count, picture_width):
 
 
 if __name__ == "__main__":
-    main(5, 5, 1900)
+    main(7, 5, 1900)
     # main(int(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3]))
