@@ -1,11 +1,10 @@
-import random
-import sys
 import os
-from collections import namedtuple
-import numpy as np
+import random
 import typing
 
+import numpy as np
 from PIL import Image, ImageDraw
+
 
 class Square(typing.NamedTuple):
     top_left_x: float
